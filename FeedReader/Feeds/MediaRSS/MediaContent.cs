@@ -10,7 +10,7 @@ namespace CodeHollow.FeedReader.Feeds.MediaRSS
     /// <summary>
     /// Media object
     /// </summary>
-    public class Media
+    public class MediaContent
     {
         
         /// <summary>
@@ -19,11 +19,11 @@ namespace CodeHollow.FeedReader.Feeds.MediaRSS
         public XElement Element { get; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Media"/> class.
+        /// Initializes a new instance of the <see cref="MediaContent"/> class.
         /// Reads a rss feed item enclosure based on the xml given in element
         /// </summary>
         /// <param name="element">enclosure element as xml</param>
-        public Media(XElement element)
+        public MediaContent(XElement element)
         {
             this.Element = element;
             

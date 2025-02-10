@@ -1,5 +1,8 @@
 ﻿namespace CodeHollow.FeedReader.Feeds
 {
+    using System;
+    using System.Diagnostics;
+
     using System.Xml.Linq;
 
     /// <summary>
@@ -16,6 +19,8 @@
         /// The "link" element
         /// </summary>
         public string Link { get; set; } // link
+
+        public Littlstar Littlstar { get; set; }
 
         /// <summary>
         /// Gets the underlying XElement in order to allow reading properties that are not available in the class itself
@@ -42,6 +47,8 @@
             this.Title = item.GetValue("title");
             this.Link = item.GetValue("link");
             this.Element = item;
+
+            this.Littlstar = new Littlstar(item);
         }
     }
 }

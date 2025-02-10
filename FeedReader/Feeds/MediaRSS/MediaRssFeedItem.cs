@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Xml.Linq;
+    using UnityEngine;
 
     /// <summary>
     /// RSS 2.0 feed item accoring to specification: https://validator.w3.org/feed/docs/rss2.html
@@ -59,7 +60,7 @@
         /// <summary>
         /// All entries from the "media:content" elements.
         /// </summary>
-        public ICollection<Media> Media { get; set; }
+        public ICollection<MediaContent> MediaContents { get; set; }
 
         /// <summary>
         /// All entries from the "media:group" elements. 
@@ -103,7 +104,7 @@
             this.Source = new FeedItemSource(item.GetElement("source"));
 
             var media = item.GetElements("media", "content");
-            this.Media = media.Select(x => new Media(x)).ToList();
+            this.MediaContents = media.Select(x => new MediaContent(x)).ToList();
 
             var mediaGroups = item.GetElements("media", "group");
             this.MediaGroups = mediaGroups.Select(x => new MediaGroup(x)).ToList();
@@ -130,6 +131,30 @@
                 PublishingDateString = this.PublishingDateString
             };
             return fi;
+        }
+
+        public bool TryGetFirstThumbnail(out Thumbnail thumbnail)
+        {
+            // Define the Media RSS namespace (adjust the URI if needed)
+            XNamespace media = "http://search.yahoo.com/mrss/";
+
+            thumbnail = Element.Descendants(media + "thumbnail")
+                .Select(x => new Thumbnail(x))
+                .FirstOrDefault();
+            
+            return thumbnail != null;
+        }
+
+        public bool TryGetFirstImage(out MediaContent content)
+        {
+            // Define the Media RSS namespace (adjust the URI if needed)
+            XNamespace media = "http://search.yahoo.com/mrss/";
+
+            content = Element.Descendants(media + "content")
+                .Select(x => new MediaContent(x))
+                .Where(x => x.Medium is Medium.Image || (x.Type?.StartsWith("image/") ?? false))
+                .FirstOrDefault();
+            return content != null;
         }
     }
 }

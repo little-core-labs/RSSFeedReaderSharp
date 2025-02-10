@@ -1,8 +1,13 @@
 ﻿namespace CodeHollow.FeedReader
 {
     using Feeds;
+
     using System;
     using System.Collections.Generic;
+    using System.Threading;
+
+    using System.Threading.Tasks;
+
 
     /// <summary>
     /// Generic feed item object that contains some basic properties. The feed item is typically
@@ -85,6 +90,37 @@
             this.Link = feedItem.Link;
             this.Categories = new List<string>();
             this.SpecificItem = feedItem;
+        }
+
+        public static async Task<(bool result, Feed feed)> IsFeed(FeedItem feedItem, CancellationToken cancellationToken)
+        {
+            if (feedItem == null) throw new ArgumentNullException(nameof(feedItem));
+
+            cancellationToken.ThrowIfCancellationRequested();
+            // If "ls:feed" element is present no need to do any testing to see if its a feed or not.
+            if (feedItem.SpecificItem.Littlstar.Feed.HasValue)
+            {
+                if (feedItem.SpecificItem.Littlstar.Feed.Value)
+                {
+                    var feed = await FeedReader.ReadAsync(feedItem.Link, cancellationToken);
+                    cancellationToken.ThrowIfCancellationRequested();
+                    return (true, feed);
+                }
+                else
+                {
+                    return (false, null);
+                }
+            }
+            // If "ls:feed" element is NOT present assume its not a feed.
+            else
+            {
+                return (false, null);
+            }
+        }
+
+        public async Task<(bool result, Feed feed)> IsFeed(CancellationToken cancellationToken)
+        {
+            return await IsFeed(this, cancellationToken);
         }
     }
 }
